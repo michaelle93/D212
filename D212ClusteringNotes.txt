@@ -183,6 +183,128 @@ plt.ylabel('variance')
 plt.xticks(features)
 plt.show()
 
+--Dimension reduction with PCA--
+-need to specify how many features to keep
+-ex. PCA(n_components=2) #keeps the first two PCA components
+
+from sklearn.decomposition import PCA
+pca = PCA(n_components=2)
+pca.fit(samples)
+transformed = pca.transform(samples)
+print(transformed.shape)
+
+import matplotlib.pyplot as plt
+xs = transformed[:,0]
+ys = transformed[:,1]
+plt.scatter(xs, ys, c=species)
+plt.show()
+
+#truncatedSCD and csr_matrix
+-scikit-learn PCA doesnt support csr_matrix
+-scikit-learn uses TrunkcatedSVD instead
+
+from sklearn.decomposition import TruncatedSVD
+model = TruncatedSVD(n_components=3)
+model.fit(documents) #documents is csr_matrix
+transformed = model.transform(documents)
+
+#a tf-idf word frequency array
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+tfidf = TfidfVectorizer()
+csr_mat = tfidf.fit_transform(documents)
+print(csr_mat.toarray())
+words = tfidf.get_feature_names()
+print(words)
+
+-clustering pipeline-
+# Perform the necessary imports
+from sklearn.decomposition import TruncatedSVD
+from sklearn.cluster import KMeans
+from sklearn.pipeline import make_pipeline
+
+# Create a TruncatedSVD instance: svd
+svd = TruncatedSVD(n_components=50)
+
+# Create a KMeans instance: kmeans
+kmeans = KMeans(n_clusters=6)
+
+# Create a pipeline: pipeline
+pipeline = make_pipeline(svd, kmeans)
+
+# Import pandas
+import pandas as pd
+
+# Fit the pipeline to articles
+pipeline.fit(articles)
+
+# Calculate the cluster labels: labels
+labels = pipeline.predict(articles)
+
+# Create a DataFrame aligning labels and titles: df
+df = pd.DataFrame({'label': labels, 'article': titles})
+
+# Display df sorted by cluster label
+print(df.sort_values('label'))
+
+
+--non negative matrix factorization--
+
+#follows fit() and transform() pattern
+#must specify number of components NMF(n_components=2)
+#works with Numpy arrays and with csr_matrix
+
+'tf_idf'
+-'tf', frequency of word in document 
+-'idf', reduces influence of frequent words
+
+from sklearn.decomposition import NMF
+model = NMF(n_components=2)
+model.fit(samples)
+nmf_features = model.transform(samples)
+print(model.components_)
+print(nmf_features)
+
+#NMF only works with non negative data, stock market data goes up or down, that is negative
+
+# Import NMF
+from sklearn.decomposition import NMF
+
+# Create an NMF instance: model
+model = NMF(n_components=6)
+
+# Fit the model to articles
+model.fit(articles)
+
+# Transform the articles: nmf_features
+nmf_features = model.transform(articles)
+
+# Print the NMF features
+print(nmf_features.round(2))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
