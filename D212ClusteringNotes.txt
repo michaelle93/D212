@@ -282,34 +282,186 @@ nmf_features = model.transform(articles)
 # Print the NMF features
 print(nmf_features.round(2))
 
+-NMF learns interpretable parts-
+-for documents
+	-NMF components represent topics
+	-NMF features combine topics into documents
+-for images
+	-NMF components are parts of images
+	- grayscale images = no colors, only shades of gray
+	-measures pixel brightness
+	-representing values btw 0 and 1 (black=0)
+-visualizing sample images-
+
+print(sample) #this will show flat array
+
+bitmap = sample.reshape((2,3)) #this helps put the image in correct array
+print(bitmap)
+#display the image
+from matplotlib import pyplot as plt
+plt.imshow(bitmap, cmap='gray', interpolation='nearest')
+plt.show()
+
+-NMF document example-
+# Import pandas
+import pandas as pd
+
+# Create a DataFrame: components_df
+components_df = pd.DataFrame(model.components_, columns=words)
+
+# Print the shape of the DataFrame
+print(components_df.shape)
+
+# Select row 3: component
+component = components_df.iloc[3]
+
+# Print result of nlargest
+print(component.nlargest())
+
+-Grayscale NMF example-
+
+# Import pyplot
+from matplotlib import pyplot as plt
+
+# Select the 0th row: digit
+digit = samples[0,:]
+
+# Print digit
+print(digit)
+
+# Reshape digit to a 13x8 array: bitmap
+bitmap = digit.reshape((13, 8))
+
+# Print bitmap
+print(bitmap)
+
+# Use plt.imshow to display bitmap
+plt.imshow(bitmap, cmap='gray', interpolation='nearest')
+plt.colorbar()
+plt.show()
+
+-decomposing with NMF digits-
+# Import NMF
+from sklearn.decomposition import NMF
+
+# Create an NMF model: model
+model = NMF(n_components=7)
+
+# Apply fit_transform to samples: features
+features = model.fit_transform(samples)
+
+# Call show_as_image on each component
+for component in model.components_:
+   show_as_image(component) 
+# Assign the 0th row of features: digit_features
+digit_features = features[0,:]
+
+# Print digit_features
+print(digit_features)
+
+-using PCA to learn parts of dataset-
+# Import PCA
+from sklearn.decomposition import PCA
+
+# Create a PCA instance: model
+model = PCA(n_components=7)
+
+# Apply fit_transform to samples: features
+features = model.fit_transform(samples)
+
+# Call show_as_image on each component
+for component in model.components_:
+    show_as_image(component)
+    
+--Building recommender systems using NMF--
+
+-apply NMF to the word frequency array-
+
+from sklearn.decomposition import NMF
+nmf = NMF(n_components=6)
+nmf_features = nmf.fit_transform(articles)
+
+-cosine similarity
+	-uses angle btw lines
+	-higher values mean more simlar
+	-max value is 1, when angle is 0 degress
+
+-calculating cosine simliarities-
+
+from sklearn.preprocessing import normalize
+norm_features = normalize(nmf_features)
+# if has index 23
+current_article = norm_features[23,:]
+similarities = norm_features.dot(current_article)
+print(similarities)
+
+-labeleling the similarities with article titles-
+
+import pandas as pd
+norm_features = normaliz(nmf_features)
+df = pd.DataFrame(norm_features, index=titles)
+current_article = df.loc['Dog bites man']
+similarities = df.dot(current_article) #to calc similarities
+print(similarities.nlargest()) #nlargest returns highest cosine similarity
+
+-cosine similarity example-
+# Perform the necessary imports
+import pandas as pd
+from sklearn.preprocessing import normalize
+
+# Normalize the NMF features: norm_features
+norm_features = normalize(nmf_features)
+
+# Create a DataFrame: df
+df = pd.DataFrame(norm_features, index=titles)
+
+# Select the row corresponding to 'Cristiano Ronaldo': article
+article = df.loc['Cristiano Ronaldo']
+
+# Compute the dot products: similarities
+similarities = df.dot(article)
+
+# Display those with the largest cosine similarity
+print(similarities.nlargest())
 
 
+-make pipeline with normalized NMF features-
 
+# Perform the necessary imports
+from sklearn.decomposition import NMF
+from sklearn.preprocessing import Normalizer, MaxAbsScaler
+from sklearn.pipeline import make_pipeline
 
+# Create a MaxAbsScaler: scaler
+scaler = MaxAbsScaler()
 
+# Create an NMF model: nmf
+nmf = NMF(n_components=20)
 
+# Create a Normalizer: normalizer
+normalizer = Normalizer()
 
+# Create a pipeline: pipeline
+pipeline = make_pipeline(scaler, nmf, normalizer)
 
+# Apply fit_transform to artists: norm_features
+norm_features = pipeline.fit_transform(artists)
 
+-finding similarities using cosine similarity-
+# Import pandas
+import pandas as pd
 
+# Create a DataFrame: df
+df = pd.DataFrame(norm_features, index=artist_names)
 
+# Select row of 'Bruce Springsteen': artist
+artist = df.loc['Bruce Springsteen']
 
+# Compute cosine similarities: similarities
+similarities = df.dot(artist)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Display those with highest cosine similarity
+print(similarities.nlargest())
 
 
 
