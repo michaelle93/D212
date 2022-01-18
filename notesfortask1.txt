@@ -1,0 +1,9 @@
+#how to remove outliers using boxplot
+
+contacts_outlier =df['Contacts']
+Q1= contacts_outlier.quantile(0.25)
+Q3= contacts_outlier.quantile(0.75)
+IQR = Q3-Q1
+filter = (contacts_outlier >= Q1-1.5*IQR) & (contacts_outlier<= Q3 + 1.5*IQR)
+contacts_outlier.loc[filter]
+sns.boxplot(filter, data=contacts_outlier)
